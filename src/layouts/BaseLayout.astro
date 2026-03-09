@@ -1,0 +1,106 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Personal website' } = Astro.props;
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/blog/', label: 'Blog' },
+  { href: '/stock/', label: 'Stock' },
+  { href: '/about/', label: 'About' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header class="border-b border-gray-200 dark:border-gray-800">
+      <nav class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+        <a href="/" class="text-lg font-bold tracking-tight hover:text-accent dark:hover:text-accent-dark transition-colors">
+          My Site
+        </a>
+        <button
+          id="menu-toggle"
+          class="sm:hidden p-2 text-gray-600 dark:text-gray-400"
+          aria-label="Toggle menu"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <ul class="hidden sm:flex gap-6 text-sm">
+          {navLinks.map(link => (
+            <li>
+              <a
+                href={link.href}
+                class:list={[
+                  'hover:text-accent dark:hover:text-accent-dark transition-colors',
+                  { 'text-accent dark:text-accent-dark font-medium': currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) },
+                ]}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <!-- Mobile menu -->
+      <ul id="mobile-menu" class="hidden sm:hidden border-t border-gray-200 dark:border-gray-800 px-4 pb-4 space-y-2 text-sm">
+        {navLinks.map(link => (
+          <li>
+            <a
+              href={link.href}
+              class:list={[
+                'block py-1 hover:text-accent dark:hover:text-accent-dark transition-colors',
+                { 'text-accent dark:text-accent-dark font-medium': currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) },
+              ]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </header>
+
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="border-t border-gray-200 dark:border-gray-800">
+      <div class="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        &copy; {new Date().getFullYear()} My Site
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      toggle?.addEventListener('click', () => {
+        menu?.classList.toggle('hidden');
+      });
+
+      // Dark mode: follow system preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        document.documentElement.classList.toggle('dark', e.matches);
+      });
+    </script>
+  </body>
+</html>

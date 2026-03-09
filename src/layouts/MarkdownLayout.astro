@@ -1,0 +1,36 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  pubDate?: Date;
+  updatedDate?: Date;
+}
+
+const { title, description, pubDate, updatedDate } = Astro.props;
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={title} description={description}>
+  <article>
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold mb-2">{title}</h1>
+      {pubDate && (
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+          {updatedDate && (
+            <span>
+              {' '}(更新: <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>)
+            </span>
+          )}
+        </div>
+      )}
+    </header>
+    <div class="prose prose-gray dark:prose-invert">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

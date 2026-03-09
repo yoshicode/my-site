@@ -1,0 +1,36 @@
+---
+import MarkdownLayout from '../../../layouts/MarkdownLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const books = await getCollection('books');
+  return books.map(book => ({
+    params: { slug: book.id },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props;
+const { Content } = await render(book);
+
+const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
+---
+
+<MarkdownLayout title={book.data.title}>
+  <div class="not-prose mb-6">
+    <a href="/stock/books/" class="text-sm text-gray-500 dark:text-gray-400 hover:text-accent dark:hover:text-accent-dark">← Books</a>
+  </div>
+  <div class="not-prose mb-6 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+    <div>著者: {book.data.author}</div>
+    <div>評価: <span class="text-yellow-500">{stars(book.data.rating)}</span></div>
+    <div>読了: {book.data.readDate.toLocaleDateString('ja-JP')}</div>
+    {book.data.tags.length > 0 && (
+      <div class="flex gap-1 flex-wrap mt-2">
+        {book.data.tags.map(tag => (
+          <span class="bg-gray-100 dark:bg-gray-800 text-xs px-2 py-0.5 rounded">{tag}</span>
+        ))}
+      </div>
+    )}
+  </div>
+  <Content />
+</MarkdownLayout>
