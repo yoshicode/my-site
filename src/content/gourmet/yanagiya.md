@@ -3,7 +3,7 @@ title: "柳家（やなぎや）"
 category: "郷土料理・ジビエ"
 area: "岐阜県瑞浪市"
 rating: 5
-visitDate: 2026-03-01
+visitDate: 2026-03-14
 image: "/images/gourmet/yanagiya-1.jpeg"
 tags: ["ジビエ", "囲炉裏", "岐阜", "名店"]
 ---

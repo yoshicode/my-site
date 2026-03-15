@@ -34,7 +34,7 @@ const recentItems: RecentItem[] = [
   })),
   ...sports.map(s => ({
     title: s.data.title,
-    date: new Date(),
+    date: s.data.eventDate ?? new Date(),
     href: `/stock/sports/${s.id}/`,
     category: 'Sports',
     icon: '⚽',

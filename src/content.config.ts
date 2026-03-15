@@ -30,6 +30,7 @@ const sports = defineCollection({
   schema: z.object({
     title: z.string(),
     category: z.string(),
+    eventDate: z.coerce.date().optional(),
     rating: z.number().min(1).max(5).optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).default([]),
