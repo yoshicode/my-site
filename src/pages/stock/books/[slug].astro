@@ -20,6 +20,9 @@ const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
   <div class="not-prose mb-6">
     <a href="/stock/books/" class="text-sm text-gray-500 dark:text-gray-400 hover:text-accent dark:hover:text-accent-dark">← Books</a>
   </div>
+  {book.data.image && (
+    <img src={book.data.image} alt={book.data.title} class="not-prose rounded-lg mb-6 w-full" />
+  )}
   <div class="not-prose mb-6 text-sm text-gray-600 dark:text-gray-400 space-y-1">
     <div>著者: {book.data.author}</div>
     <div>評価: <span class="text-yellow-500">{stars(book.data.rating)}</span></div>

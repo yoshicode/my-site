@@ -8,6 +8,7 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
+    image: z.string().optional(),
     tags: z.array(z.string()).default([]),
   }),
 });
@@ -19,7 +20,7 @@ const books = defineCollection({
     author: z.string(),
     rating: z.number().min(1).max(5),
     readDate: z.coerce.date(),
-    cover: z.string().optional(),
+    image: z.string().optional(),
     tags: z.array(z.string()).default([]),
   }),
 });
@@ -30,8 +31,22 @@ const sports = defineCollection({
     title: z.string(),
     category: z.string(),
     rating: z.number().min(1).max(5).optional(),
+    image: z.string().optional(),
     tags: z.array(z.string()).default([]),
   }),
 });
 
-export const collections = { blog, books, sports };
+const gourmet = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/gourmet' }),
+  schema: z.object({
+    title: z.string(),
+    category: z.string(),
+    area: z.string().optional(),
+    rating: z.number().min(1).max(5).optional(),
+    visitDate: z.coerce.date().optional(),
+    image: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { blog, books, sports, gourmet };

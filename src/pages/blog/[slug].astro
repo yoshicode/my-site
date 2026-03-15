@@ -20,5 +20,8 @@ const { Content } = await render(post);
   pubDate={post.data.pubDate}
   updatedDate={post.data.updatedDate}
 >
+  {post.data.image && (
+    <img src={post.data.image} alt={post.data.title} class="rounded-lg mb-6 w-full" />
+  )}
   <Content />
 </MarkdownLayout>
