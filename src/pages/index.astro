@@ -2,14 +2,58 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection('blog');
-const recentPosts = allPosts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+const [blog, books, sports, gourmet] = await Promise.all([
+  getCollection('blog'),
+  getCollection('books'),
+  getCollection('sports'),
+  getCollection('gourmet'),
+]);
+
+type RecentItem = {
+  title: string;
+  date: Date;
+  href: string;
+  category: string;
+  icon: string;
+};
+
+const recentItems: RecentItem[] = [
+  ...blog.map(p => ({
+    title: p.data.title,
+    date: p.data.pubDate,
+    href: `/blog/${p.id}/`,
+    category: 'Blog',
+    icon: '📝',
+  })),
+  ...books.map(b => ({
+    title: b.data.title,
+    date: b.data.readDate,
+    href: `/stock/books/${b.id}/`,
+    category: 'Books',
+    icon: '📚',
+  })),
+  ...sports.map(s => ({
+    title: s.data.title,
+    date: new Date(),
+    href: `/stock/sports/${s.id}/`,
+    category: 'Sports',
+    icon: '⚽',
+  })),
+  ...gourmet.map(g => ({
+    title: g.data.title,
+    date: g.data.visitDate ?? new Date(),
+    href: `/stock/gourmet/${g.id}/`,
+    category: 'Gourmet',
+    icon: '🍽️',
+  })),
+]
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf())
+  .slice(0, 5);
 
 const stockCategories = [
   { href: '/stock/books/', label: 'Books', icon: '📚', description: '読んだ本' },
   { href: '/stock/sports/', label: 'Sports', icon: '⚽', description: 'スポーツ' },
+  { href: '/stock/gourmet/', label: 'Gourmet', icon: '🍽️', description: 'グルメ・飲食店' },
 ];
 
 const formatDate = (date: Date) =>
@@ -25,26 +69,21 @@ const formatDate = (date: Date) =>
   </section>
 
   <section class="mb-12">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold">Recent Posts</h2>
-      <a href="/blog/" class="text-sm text-accent dark:text-accent-dark hover:underline">View all →</a>
-    </div>
-    {recentPosts.length > 0 ? (
+    <h2 class="text-xl font-bold mb-4">Recent Posts</h2>
+    {recentItems.length > 0 ? (
       <ul class="space-y-4">
-        {recentPosts.map(post => (
+        {recentItems.map(item => (
           <li>
-            <a href={`/blog/${post.id}/`} class="group block">
-              <div class="text-sm text-gray-500 dark:text-gray-400">
-                {formatDate(post.data.pubDate)}
+            <a href={item.href} class="group block">
+              <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <span>{item.icon}</span>
+                <span>{item.category}</span>
+                <span>·</span>
+                <span>{formatDate(item.date)}</span>
               </div>
               <div class="font-medium group-hover:text-accent dark:group-hover:text-accent-dark transition-colors">
-                {post.data.title}
+                {item.title}
               </div>
-              {post.data.description && (
-                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {post.data.description}
-                </div>
-              )}
             </a>
           </li>
         ))}
