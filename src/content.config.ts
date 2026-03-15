@@ -24,47 +24,14 @@ const books = defineCollection({
   }),
 });
 
-const supplements = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/supplements' }),
+const sports = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/sports' }),
   schema: z.object({
     title: z.string(),
-    brand: z.string(),
     category: z.string(),
-    rating: z.number().min(1).max(5),
+    rating: z.number().min(1).max(5).optional(),
     tags: z.array(z.string()).default([]),
   }),
 });
 
-const gadgets = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/gadgets' }),
-  schema: z.object({
-    title: z.string(),
-    brand: z.string(),
-    category: z.string(),
-    rating: z.number().min(1).max(5),
-    purchaseDate: z.coerce.date().optional(),
-    tags: z.array(z.string()).default([]),
-  }),
-});
-
-const entertainment = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/entertainment' }),
-  schema: z.object({
-    title: z.string(),
-    category: z.string(),
-    creator: z.string().optional(),
-    rating: z.number().min(1).max(5),
-    tags: z.array(z.string()).default([]),
-  }),
-});
-
-const lifestyle = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/lifestyle' }),
-  schema: z.object({
-    title: z.string(),
-    category: z.string(),
-    tags: z.array(z.string()).default([]),
-  }),
-});
-
-export const collections = { blog, books, supplements, gadgets, entertainment, lifestyle };
+export const collections = { blog, books, sports };

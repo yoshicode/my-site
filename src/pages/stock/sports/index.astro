@@ -2,25 +2,26 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const items = await getCollection('supplements');
+const items = await getCollection('sports');
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
 ---
 
-<BaseLayout title="Supplements | Yoshi.T" description="プロテイン・サプリメント">
+<BaseLayout title="Sports | Yoshi.T" description="スポーツ">
   <div class="mb-6">
     <a href="/stock/" class="text-sm text-gray-500 dark:text-gray-400 hover:text-accent dark:hover:text-accent-dark">← Stock</a>
   </div>
-  <h1 class="text-2xl font-bold mb-6">💪 Supplements</h1>
+  <h1 class="text-2xl font-bold mb-6">⚽ Sports</h1>
   {items.length > 0 ? (
     <ul class="space-y-4">
       {items.map(item => (
         <li>
-          <a href={`/stock/supplements/${item.id}/`} class="group block border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:border-accent dark:hover:border-accent-dark transition-colors">
+          <a href={`/stock/sports/${item.id}/`} class="group block border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:border-accent dark:hover:border-accent-dark transition-colors">
             <div class="font-medium group-hover:text-accent dark:group-hover:text-accent-dark transition-colors">
               {item.data.title}
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {item.data.brand} · {item.data.category} · <span class="text-yellow-500">{stars(item.data.rating)}</span>
+              {item.data.category}
+              {item.data.rating != null && <span> · <span class="text-yellow-500">{stars(item.data.rating)}</span></span>}
             </div>
           </a>
         </li>

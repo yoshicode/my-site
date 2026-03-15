@@ -2,20 +2,14 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const [books, supplements, gadgets, entertainment, lifestyle] = await Promise.all([
+const [books, sports] = await Promise.all([
   getCollection('books'),
-  getCollection('supplements'),
-  getCollection('gadgets'),
-  getCollection('entertainment'),
-  getCollection('lifestyle'),
+  getCollection('sports'),
 ]);
 
 const categories = [
   { href: '/stock/books/', label: 'Books', icon: '📚', description: '読んだ本', count: books.length },
-  { href: '/stock/supplements/', label: 'Supplements', icon: '💪', description: 'プロテイン・サプリ', count: supplements.length },
-  { href: '/stock/gadgets/', label: 'Gadgets', icon: '⌨️', description: 'ガジェット・機材', count: gadgets.length },
-  { href: '/stock/entertainment/', label: 'Entertainment', icon: '🎬', description: '映画・音楽・エンタメ', count: entertainment.length },
-  { href: '/stock/lifestyle/', label: 'Lifestyle', icon: '🌿', description: 'ライフスタイル', count: lifestyle.length },
+  { href: '/stock/sports/', label: 'Sports', icon: '⚽', description: 'スポーツ', count: sports.length },
 ];
 ---
 
