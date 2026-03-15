@@ -1,18 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const links = [
+  { label: 'X (Twitter)', href: 'https://x.com/yoshi_takashiba' },
+  { label: 'YOUTRUST', href: 'https://youtrust.jp/users/yoshitk' },
+  { label: 'FastGrow', href: 'https://www.fastgrow.jp/people/2319' },
+];
 ---
 
 <BaseLayout title="About | Yoshi.T" description="プロフィール">
   <h1 class="text-2xl font-bold mb-6">About</h1>
   <div class="prose prose-gray dark:prose-invert">
+    <h2>高柴 慶人（Yoshihito Takashiba）</h2>
+    <p>株式会社ハイヤールー 取締役COO</p>
+
+    <h3>経歴</h3>
     <p>
-      ようこそ。このサイトでは、自分の好きなものや体験をストックとして記録しています。
+      ソフトウェアエンジニアとしてキャリアをスタートし、4社の開発プロジェクトに従事。
+      2018年にLINE株式会社に入社し、O2O領域のサービス企画を担当。
+      2020年よりコマースメディア事業の事業責任者を歴任。
     </p>
-    <h2>このサイトについて</h2>
     <p>
-      <strong>Stock</strong> — 読んだ本、スポーツ、グルメなど、
-      自分を構成する要素をカテゴリ別にまとめています。
-      これを見れば、だいたい自分のことがわかるはずです。
+      その後、東南アジアを中心とするフィンテック企業でグローバルプロダクトマネージャーを経験。
+      2022年、株式会社ハイヤールーに取締役COOとして参画。
+      マーケティング・セールスを中心にビジネス領域全般を統括し、500社以上のエンジニア採用を支援。
     </p>
+
+    <h3>スポーツ</h3>
+    <p>
+      サッカーは12年間のプレー経験あり。現在はトライアスロン・登山にも取り組んでいる。
+    </p>
+  </div>
+
+  <div class="mt-8 flex gap-4">
+    {links.map(link => (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-sm text-accent dark:text-accent-dark hover:underline"
+      >
+        {link.label} ↗
+      </a>
+    ))}
   </div>
 </BaseLayout>
