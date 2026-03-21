@@ -2,7 +2,6 @@
 title: "静岡マラソン 2026"
 category: "マラソン"
 eventDate: 2026-03-08
-rating: 4
 image: "/images/sports/shizuoka-marathon-start.jpeg"
 tags: ["マラソン", "静岡", "フルマラソン"]
 ---

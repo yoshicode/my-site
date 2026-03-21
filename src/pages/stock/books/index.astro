@@ -5,7 +5,6 @@ import { getCollection } from 'astro:content';
 const books = await getCollection('books');
 const sorted = books.sort((a, b) => b.data.readDate.valueOf() - a.data.readDate.valueOf());
 
-const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
 ---
 
 <BaseLayout title="Books | Yoshi.T" description="読んだ本">
@@ -22,7 +21,7 @@ const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
               {book.data.title}
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {book.data.author} · <span class="text-yellow-500">{stars(book.data.rating)}</span>
+              {book.data.author}
             </div>
           </a>
         </li>

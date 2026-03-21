@@ -3,7 +3,6 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
 const items = await getCollection('sports');
-const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
 ---
 
 <BaseLayout title="Sports | Yoshi.T" description="スポーツ">
@@ -21,7 +20,6 @@ const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {item.data.category}
-              {item.data.rating != null && <span> · <span class="text-yellow-500">{stars(item.data.rating)}</span></span>}
             </div>
           </a>
         </li>
