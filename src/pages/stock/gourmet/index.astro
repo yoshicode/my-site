@@ -8,7 +8,6 @@ const sorted = gourmet.sort((a, b) => {
   return 0;
 });
 
-const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
 ---
 
 <BaseLayout title="Gourmet | Yoshi.T" description="グルメ・飲食店">
@@ -27,7 +26,6 @@ const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
             <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {item.data.category}
               {item.data.area && ` · ${item.data.area}`}
-              {item.data.rating && <span class="text-yellow-500"> · {stars(item.data.rating)}</span>}
             </div>
           </a>
         </li>

@@ -6,7 +6,6 @@ const books = defineCollection({
   schema: z.object({
     title: z.string(),
     author: z.string(),
-    rating: z.number().min(1).max(5),
     readDate: z.coerce.date(),
     image: z.string().optional(),
     tags: z.array(z.string()).default([]),
@@ -19,7 +18,6 @@ const sports = defineCollection({
     title: z.string(),
     category: z.string(),
     eventDate: z.coerce.date().optional(),
-    rating: z.number().min(1).max(5).optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).default([]),
   }),
@@ -31,7 +29,6 @@ const gourmet = defineCollection({
     title: z.string(),
     category: z.string(),
     area: z.string().optional(),
-    rating: z.number().min(1).max(5).optional(),
     visitDate: z.coerce.date().optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).default([]),

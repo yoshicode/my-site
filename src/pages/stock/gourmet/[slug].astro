@@ -13,7 +13,6 @@ export async function getStaticPaths() {
 const { item } = Astro.props;
 const { Content } = await render(item);
 
-const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
 ---
 
 <MarkdownLayout title={item.data.title}>
@@ -26,7 +25,6 @@ const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
   <div class="not-prose mb-6 text-sm text-gray-600 dark:text-gray-400 space-y-1">
     <div>カテゴリ: {item.data.category}</div>
     {item.data.area && <div>エリア: {item.data.area}</div>}
-    {item.data.rating && <div>評価: <span class="text-yellow-500">{stars(item.data.rating)}</span></div>}
     {item.data.visitDate && <div>訪問日: {item.data.visitDate.toLocaleDateString('ja-JP')}</div>}
     {item.data.tags.length > 0 && (
       <div class="flex gap-1 flex-wrap mt-2">
