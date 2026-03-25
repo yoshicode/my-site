@@ -1,0 +1,288 @@
+---
+/**
+ * HubSpot データ取得デモページ
+ *
+ * このページは Astro のサーバーサイドレンダリング（ビルド時）で
+ * HubSpot API からデータを取得して表示するサンプルです。
+ *
+ * 事前準備:
+ * 1. HubSpot でプライベートアプリを作成し、アクセストークンを発行
+ *    https://app.hubspot.com/private-apps/<your-hub-id>
+ *    必要スコープ: crm.objects.contacts.read, crm.objects.companies.read, crm.objects.deals.read
+ * 2. プロジェクトルートに .env ファイルを作成
+ *    HUBSPOT_ACCESS_TOKEN=pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ * 3. astro build（または astro dev）を実行
+ */
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getContacts, getCompanies, getDeals } from "../lib/hubspot";
+
+// HUBSPOT_ACCESS_TOKEN が未設定の場合はサンプルデータを表示
+const hasToken = Boolean(import.meta.env.HUBSPOT_ACCESS_TOKEN);
+
+let contacts: Awaited<ReturnType<typeof getContacts>>["results"] = [];
+let companies: Awaited<ReturnType<typeof getCompanies>>["results"] = [];
+let deals: Awaited<ReturnType<typeof getDeals>>["results"] = [];
+let error: string | null = null;
+
+if (hasToken) {
+  try {
+    const [contactsRes, companiesRes, dealsRes] = await Promise.all([
+      getContacts({ limit: 5 }),
+      getCompanies({ limit: 5 }),
+      getDeals({ limit: 5 }),
+    ]);
+    contacts = contactsRes.results;
+    companies = companiesRes.results;
+    deals = dealsRes.results;
+  } catch (e) {
+    error = e instanceof Error ? e.message : String(e);
+  }
+}
+---
+
+<BaseLayout title="HubSpot データ" description="HubSpot CRM データの取得サンプル">
+  <div class="max-w-4xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-2">HubSpot データ取得</h1>
+    <p class="text-gray-500 dark:text-gray-400 mb-8">
+      <code class="text-sm bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">src/lib/hubspot.ts</code>
+      を使った CRM データ取得のサンプルページです。
+    </p>
+
+    {/* トークン未設定の案内 */}
+    {!hasToken && (
+      <div class="rounded-lg border border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700 p-5 mb-8">
+        <h2 class="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">⚠ HUBSPOT_ACCESS_TOKEN が未設定です</h2>
+        <p class="text-sm text-yellow-700 dark:text-yellow-400 mb-3">
+          以下の手順でアクセストークンを設定すると、実際の HubSpot データが表示されます。
+        </p>
+        <ol class="text-sm text-yellow-700 dark:text-yellow-400 list-decimal list-inside space-y-1">
+          <li>
+            <a href="https://app.hubspot.com" target="_blank" rel="noopener" class="underline">HubSpot</a>
+            にログインし、「設定 → インテグレーション → プライベートアプリ」を開く
+          </li>
+          <li>「プライベートアプリを作成」をクリック、スコープに <code class="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">crm.objects.contacts.read</code> などを追加</li>
+          <li>
+            アクセストークンをコピーし、プロジェクトルートの
+            <code class="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">.env</code>
+            ファイルに追記：
+          </li>
+        </ol>
+        <pre class="mt-3 text-xs bg-yellow-100 dark:bg-yellow-900 rounded p-3 overflow-x-auto">HUBSPOT_ACCESS_TOKEN=pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</pre>
+      </div>
+    )}
+
+    {/* API エラー表示 */}
+    {error && (
+      <div class="rounded-lg border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700 p-5 mb-8">
+        <h2 class="font-semibold text-red-800 dark:text-red-300 mb-1">API エラー</h2>
+        <p class="text-sm text-red-700 dark:text-red-400">{error}</p>
+      </div>
+    )}
+
+    {/* 使い方コードサンプル */}
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">使い方</h2>
+      <div class="prose dark:prose-invert max-w-none">
+        <pre class="text-sm overflow-x-auto"><code>{`// Astro ページ・コンポーネントのフロントマターで使用
+import { getContacts, getCompanies, getDeals, getAllContacts } from "../lib/hubspot";
+
+// 最新 10 件のコンタクトを取得
+const { results: contacts } = await getContacts({ limit: 10 });
+
+// 追加プロパティも指定可能
+const { results: companies } = await getCompanies({
+  limit: 5,
+  properties: ["annualrevenue", "website"],
+});
+
+// ページネーションを自動処理して全件取得（最大 500 件）
+const allContacts = await getAllContacts();`}</code></pre>
+      </div>
+    </section>
+
+    {/* コンタクト一覧 */}
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">
+        コンタクト
+        {hasToken && !error && (
+          <span class="ml-2 text-sm font-normal text-gray-500">（最新 5 件）</span>
+        )}
+      </h2>
+
+      {hasToken && !error ? (
+        contacts.length > 0 ? (
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-gray-100 dark:bg-gray-800">
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">名前</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">メール</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">会社</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">役職</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contacts.map((c) => (
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {[c.properties.firstname, c.properties.lastname].filter(Boolean).join(" ") || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.email || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.company || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.jobtitle || "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="text-gray-500 dark:text-gray-400">コンタクトが見つかりませんでした。</p>
+        )
+      ) : (
+        <div class="rounded bg-gray-100 dark:bg-gray-800 p-4 text-sm text-gray-500 dark:text-gray-400">
+          トークンを設定するとここに実データが表示されます。
+        </div>
+      )}
+    </section>
+
+    {/* 会社一覧 */}
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">
+        会社
+        {hasToken && !error && (
+          <span class="ml-2 text-sm font-normal text-gray-500">（最新 5 件）</span>
+        )}
+      </h2>
+
+      {hasToken && !error ? (
+        companies.length > 0 ? (
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-gray-100 dark:bg-gray-800">
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">会社名</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">ドメイン</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">業種</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">都市</th>
+                </tr>
+              </thead>
+              <tbody>
+                {companies.map((c) => (
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.name || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.domain || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.industry || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {c.properties.city || "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="text-gray-500 dark:text-gray-400">会社が見つかりませんでした。</p>
+        )
+      ) : (
+        <div class="rounded bg-gray-100 dark:bg-gray-800 p-4 text-sm text-gray-500 dark:text-gray-400">
+          トークンを設定するとここに実データが表示されます。
+        </div>
+      )}
+    </section>
+
+    {/* 取引一覧 */}
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold mb-4">
+        取引（ディール）
+        {hasToken && !error && (
+          <span class="ml-2 text-sm font-normal text-gray-500">（最新 5 件）</span>
+        )}
+      </h2>
+
+      {hasToken && !error ? (
+        deals.length > 0 ? (
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-gray-100 dark:bg-gray-800">
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">取引名</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">金額</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">ステージ</th>
+                  <th class="text-left px-3 py-2 border border-gray-200 dark:border-gray-700">クローズ予定日</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deals.map((d) => (
+                  <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {d.properties.dealname || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {d.properties.amount
+                        ? `¥${Number(d.properties.amount).toLocaleString()}`
+                        : "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {d.properties.dealstage || "—"}
+                    </td>
+                    <td class="px-3 py-2 border border-gray-200 dark:border-gray-700">
+                      {d.properties.closedate
+                        ? new Date(d.properties.closedate).toLocaleDateString("ja-JP")
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p class="text-gray-500 dark:text-gray-400">取引が見つかりませんでした。</p>
+        )
+      ) : (
+        <div class="rounded bg-gray-100 dark:bg-gray-800 p-4 text-sm text-gray-500 dark:text-gray-400">
+          トークンを設定するとここに実データが表示されます。
+        </div>
+      )}
+    </section>
+
+    {/* 参考リンク */}
+    <section>
+      <h2 class="text-xl font-semibold mb-4">参考リンク</h2>
+      <ul class="text-sm space-y-2 text-blue-600 dark:text-blue-400">
+        <li>
+          <a href="https://developers.hubspot.com/docs/api/crm/contacts" target="_blank" rel="noopener" class="hover:underline">
+            HubSpot CRM API — Contacts
+          </a>
+        </li>
+        <li>
+          <a href="https://developers.hubspot.com/docs/api/crm/companies" target="_blank" rel="noopener" class="hover:underline">
+            HubSpot CRM API — Companies
+          </a>
+        </li>
+        <li>
+          <a href="https://developers.hubspot.com/docs/api/crm/deals" target="_blank" rel="noopener" class="hover:underline">
+            HubSpot CRM API — Deals
+          </a>
+        </li>
+        <li>
+          <a href="https://developers.hubspot.com/docs/api/private-apps" target="_blank" rel="noopener" class="hover:underline">
+            プライベートアプリの作成方法
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
