@@ -2,7 +2,10 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const items = await getCollection('sports');
+const items = (await getCollection('sports')).sort((a, b) => {
+  if (a.data.visitDate && b.data.visitDate) return b.data.visitDate.valueOf() - a.data.visitDate.valueOf();
+  return 0;
+});
 ---
 
 <BaseLayout title="Sports | Yoshi.T" description="スポーツ">
